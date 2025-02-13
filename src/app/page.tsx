@@ -114,7 +114,7 @@ export default function Home() {
                 <div className="overflow-hidden">
                   <div className="mt-2">
                     <p className="text-primaryLight">{post.content}</p>
-                    <div className="mt-3 border-t pt-2">
+                    <div className="mt-3 border-t pt-4">
                       <h3 className="text-sm font-semibold text-gray-700">Replies:</h3>
                       <ul className="mt-1 space-y-1">
                         {post.replies.map((reply, replyIndex) => (
