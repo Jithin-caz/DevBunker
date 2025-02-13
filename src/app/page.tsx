@@ -78,7 +78,7 @@ export default function Home() {
       </div>
      
     <div className="col-span-7 md:col-span-5">
-    <div className="max-w-4xl mx-auto mt-6 space-y-4 p-2">
+    <div className="max-w-4xl mx-auto mt-6 space-y-7 p-2">
         {posts.map((post, index) => (
           <div key={index} className="flex relative">
             {/* Round Icon - Centered vertically */}
