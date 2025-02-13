@@ -91,7 +91,7 @@ export default function Home() {
             </div>
 
             {/* Collapsible Section with left padding for icon */}
-            <div className="flex-1 bg-background border-b border-orange p-4 py-8 rounded shadow-md ml-14">
+            <div className="flex-1 bg-background border-b border-orange p-4 py-8 rounded shadow-lg ml-14">
               {/* Heading */}
               <div
                 className="flex justify-between gap-1 items-center cursor-pointer"
