@@ -36,24 +36,22 @@ export async function POST(request: Request) {
     }
     let user: any;
     try {
-      // Verify token using Firebase Admin
       user = await verifyFirebaseToken(token);
     } catch (err: any) {
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
 
-    const { title, content } = await request.json();
-    if (!title) {
+    const { title, content, category } = await request.json();
+    if (!title || !category)
       return NextResponse.json(
-        { message: "Title is required" },
+        { message: "Title and category are required" },
         { status: 400 }
       );
-    }
 
     const newPost = new Post({
       title,
       content,
-      // Store the Firebase UID as the author
+      category,
       author: user.uid,
     });
     await newPost.save();

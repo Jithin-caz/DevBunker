@@ -35,17 +35,19 @@ export async function PUT(
   try {
     // Authenticate using Firebase token verification
     const authHeader = request.headers.get("authorization");
-    if (!authHeader)
+    if (!authHeader) {
       return NextResponse.json(
         { message: "No authorization header" },
         { status: 401 }
       );
+    }
     const token = authHeader.split(" ")[1];
-    if (!token)
+    if (!token) {
       return NextResponse.json(
         { message: "No token provided" },
         { status: 401 }
       );
+    }
     let user: any;
     try {
       user = await verifyFirebaseToken(token);
@@ -54,15 +56,17 @@ export async function PUT(
     }
 
     const post = await Post.findById(id);
-    if (!post)
+    if (!post) {
       return NextResponse.json({ message: "Post not found" }, { status: 404 });
-    // Compare the stored author (Firebase UID) with the verified user's UID
-    if (post.author.toString() !== user.uid)
+    }
+    if (post.author.toString() !== user.uid) {
       return NextResponse.json({ message: "Not authorized" }, { status: 403 });
+    }
 
-    const { title, content } = await request.json();
+    const { title, content, category } = await request.json();
     post.title = title || post.title;
     post.content = content || post.content;
+    post.category = category || post.category; // update category if provided
     post.updatedAt = new Date();
     await post.save();
     return NextResponse.json(post, { status: 200 });

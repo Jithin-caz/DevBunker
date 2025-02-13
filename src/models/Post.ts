@@ -3,6 +3,7 @@ import mongoose, { Document, Model } from "mongoose";
 export interface IPost extends Document {
   title: string;
   content?: string;
+  category: string;
   author: mongoose.Types.ObjectId;
   votes: number;
   createdAt: Date;
@@ -12,6 +13,7 @@ export interface IPost extends Document {
 const PostSchema = new mongoose.Schema<IPost>({
   title: { type: String, required: true },
   content: { type: String },
+  category: { type: String, required: true },
   author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   votes: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
