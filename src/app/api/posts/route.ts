@@ -8,9 +8,9 @@ export async function GET() {
   try {
     const posts = await Post.find({}).populate("author", "username");
     return NextResponse.json(posts, { status: 200 });
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
-      { message: "Error fetching posts", error: error.message },
+      { message: "Error fetching posts", error: error },
       { status: 500 }
     );
   }
@@ -34,10 +34,11 @@ export async function POST(request: Request) {
         { status: 401 }
       );
     }
-    let user: any;
+    let user;
     try {
       user = await verifyFirebaseToken(token);
-    } catch (err: any) {
+    } catch (err) {
+      console.log(err);
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
 
@@ -56,7 +57,7 @@ export async function POST(request: Request) {
     });
     await newPost.save();
     return NextResponse.json(newPost, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ message: error.message }, { status: 401 });
+  } catch (error) {
+    return NextResponse.json({ message: error }, { status: 401 });
   }
 }
