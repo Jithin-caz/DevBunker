@@ -8,9 +8,9 @@ export async function GET() {
   try {
     const posts = await Post.find({}).populate("author", "username");
     return NextResponse.json(posts, { status: 200 });
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
-      { message: "Error fetching posts", error: error.message },
+      { message: "Error fetching posts", error: error },
       { status: 500 }
     );
   }
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
         { status: 401 }
       );
     }
-    let user: any;
+    let user;
     try {
       user = await verifyFirebaseToken(token);
     } catch (err) {

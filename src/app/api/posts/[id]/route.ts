@@ -16,9 +16,9 @@ export async function GET(
     if (!post)
       return NextResponse.json({ message: "Post not found" }, { status: 404 });
     return NextResponse.json(post, { status: 200 });
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
-      { message: "Error fetching post", error: error.message },
+      { message: "Error fetching post", error: error },
       { status: 500 }
     );
   }
@@ -48,10 +48,11 @@ export async function PUT(
         { status: 401 }
       );
     }
-    let user: any;
+    let user;
     try {
       user = await verifyFirebaseToken(token);
-    } catch (err: any) {
+    } catch (err) {
+      console.log(err);
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
 
@@ -70,8 +71,8 @@ export async function PUT(
     post.updatedAt = new Date();
     await post.save();
     return NextResponse.json(post, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ message: error.message }, { status: 401 });
+  } catch (error) {
+    return NextResponse.json({ message: error }, { status: 401 });
   }
 }
 
@@ -97,10 +98,11 @@ export async function DELETE(
         { message: "No token provided" },
         { status: 401 }
       );
-    let user: any;
+    let user;
     try {
       user = await verifyFirebaseToken(token);
-    } catch (err: any) {
+    } catch (err) {
+      console.log(err);
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
 
@@ -112,7 +114,7 @@ export async function DELETE(
 
     await post.deleteOne();
     return NextResponse.json({ message: "Post deleted" }, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ message: error.message }, { status: 401 });
+  } catch (error) {
+    return NextResponse.json({ message: error }, { status: 401 });
   }
 }
