@@ -5,6 +5,7 @@ import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebaseConfig";
 
 export default function Login() {
+  //@ts-ignore
   const [userData, setUserData] = useState<any>(null);
   const [error, setError] = useState<string>("");
 
@@ -24,8 +25,9 @@ export default function Login() {
       }
       const data = await response.json();
       setUserData(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      console.log(err);
+      setError("Backend authentication");
     }
   };
 

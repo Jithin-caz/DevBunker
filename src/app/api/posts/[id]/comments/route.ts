@@ -18,9 +18,9 @@ export async function GET(
       "username"
     );
     return NextResponse.json(comments, { status: 200 });
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
-      { message: "Error fetching comments", error: error.message },
+      { message: "Error fetching comments", error: error },
       { status: 500 }
     );
   }
@@ -49,11 +49,12 @@ export async function POST(
         { status: 401 }
       );
 
-    let user: any;
+    let user;
     try {
       // Verify the Firebase token (this function should return the decoded token with uid)
       user = await verifyFirebaseToken(token);
-    } catch (err: any) {
+    } catch (err) {
+      console.log(err);
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
 
@@ -73,7 +74,7 @@ export async function POST(
     });
     await newComment.save();
     return NextResponse.json(newComment, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ message: error.message }, { status: 401 });
+  } catch (error) {
+    return NextResponse.json({ message: error }, { status: 401 });
   }
 }

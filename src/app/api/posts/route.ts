@@ -37,7 +37,8 @@ export async function POST(request: Request) {
     let user: any;
     try {
       user = await verifyFirebaseToken(token);
-    } catch (err: any) {
+    } catch (err) {
+      console.log(err);
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
 
@@ -56,7 +57,7 @@ export async function POST(request: Request) {
     });
     await newPost.save();
     return NextResponse.json(newPost, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ message: error.message }, { status: 401 });
+  } catch (error) {
+    return NextResponse.json({ message: error }, { status: 401 });
   }
 }
