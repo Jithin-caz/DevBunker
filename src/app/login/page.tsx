@@ -5,7 +5,7 @@ import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebaseConfig";
 
 export default function Login() {
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState(null);
   const [error, setError] = useState<string>("");
 
   const handleGoogleSignIn = async () => {
@@ -24,7 +24,7 @@ export default function Login() {
       }
       const data = await response.json();
       setUserData(data);
-    } catch (err: any) {
+    } catch (err:Error | unknown) {
       setError(err.message);
     }
   };
