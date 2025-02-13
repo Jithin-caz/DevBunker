@@ -29,10 +29,11 @@ export async function PUT(
       );
     }
 
-    let user: any;
+    let user;
     try {
       user = await verifyFirebaseToken(token);
-    } catch (err: any) {
+    } catch (err) {
+      console.log(err);
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
 
@@ -55,8 +56,8 @@ export async function PUT(
     await comment.save();
 
     return NextResponse.json(comment, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ message: error.message }, { status: 401 });
+  } catch (error) {
+    return NextResponse.json({ message: error }, { status: 401 });
   }
 }
 
@@ -86,10 +87,11 @@ export async function DELETE(
       );
     }
 
-    let user: any;
+    let user;
     try {
       user = await verifyFirebaseToken(token);
-    } catch (err: any) {
+    } catch (err) {
+      console.log(err);
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
 
@@ -108,7 +110,7 @@ export async function DELETE(
 
     await comment.deleteOne();
     return NextResponse.json({ message: "Comment deleted" }, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ message: error.message }, { status: 401 });
+  } catch (error) {
+    return NextResponse.json({ message: error }, { status: 401 });
   }
 }

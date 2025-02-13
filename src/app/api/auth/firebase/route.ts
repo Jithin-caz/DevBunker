@@ -29,9 +29,9 @@ export async function POST(request: Request) {
 
     // Return the user data (optionally, you could generate a custom token or session here)
     return NextResponse.json(user, { status: user ? 200 : 201 });
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
-      { message: "Authentication failed", error: error.message },
+      { message: "Authentication failed", error: error },
       { status: 401 }
     );
   }
