@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Comment from "@/models/Comment";
-import jwt from "jsonwebtoken";
+import { verifyFirebaseToken } from "@/lib/verifyFirebaseToken";
 
 // GET comments for a post
 export async function GET(
   request: Request,
   context: { params: { id: string } }
 ) {
+  // Resolve dynamic route parameters
   const resolvedParams = await Promise.resolve(context.params);
   const { id } = resolvedParams;
   await dbConnect();
@@ -34,7 +35,7 @@ export async function POST(
   const { id } = resolvedParams;
   await dbConnect();
   try {
-    // Authenticate
+    // Authenticate using Firebase
     const authHeader = request.headers.get("authorization");
     if (!authHeader)
       return NextResponse.json(
@@ -47,9 +48,11 @@ export async function POST(
         { message: "No token provided" },
         { status: 401 }
       );
+
     let user: any;
     try {
-      user = jwt.verify(token, process.env.JWT_SECRET as string);
+      // Verify the Firebase token (this function should return the decoded token with uid)
+      user = await verifyFirebaseToken(token);
     } catch (err: any) {
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
@@ -65,7 +68,8 @@ export async function POST(
       post: id,
       content,
       parentComment: parentComment || null,
-      author: user.userId,
+      // Store the Firebase UID as the author
+      author: user.uid,
     });
     await newComment.save();
     return NextResponse.json(newComment, { status: 201 });

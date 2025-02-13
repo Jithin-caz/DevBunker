@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Post from "@/models/Post";
-import jwt from "jsonwebtoken";
+import { verifyFirebaseToken } from "@/lib/verifyFirebaseToken";
 
 export async function GET() {
   await dbConnect();
@@ -19,37 +19,42 @@ export async function GET() {
 export async function POST(request: Request) {
   await dbConnect();
   try {
-    // Get and validate auth token
+    // Get and validate auth token from Firebase
     const authHeader = request.headers.get("authorization");
-    if (!authHeader)
+    if (!authHeader) {
       return NextResponse.json(
         { message: "No authorization header" },
         { status: 401 }
       );
+    }
     const token = authHeader.split(" ")[1];
-    if (!token)
+    if (!token) {
       return NextResponse.json(
         { message: "No token provided" },
         { status: 401 }
       );
+    }
     let user: any;
     try {
-      user = jwt.verify(token, process.env.JWT_SECRET as string);
+      // Verify token using Firebase Admin
+      user = await verifyFirebaseToken(token);
     } catch (err: any) {
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
 
     const { title, content } = await request.json();
-    if (!title)
+    if (!title) {
       return NextResponse.json(
         { message: "Title is required" },
         { status: 400 }
       );
+    }
 
     const newPost = new Post({
       title,
       content,
-      author: user.userId,
+      // Store the Firebase UID as the author
+      author: user.uid,
     });
     await newPost.save();
     return NextResponse.json(newPost, { status: 201 });
