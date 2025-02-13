@@ -65,7 +65,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-     
+    
     <div className="  grid md:grid-cols-7 bg-red w-full min-h-dvh">
       <div className=" relative w-full col-span-7 md:col-span-2">
       <div className=" h-full bg-fixed border-b-4 border-r-0 md:border-r-4 shadow-xl md:border-b-0 border-offwhite
