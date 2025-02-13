@@ -5,9 +5,12 @@ import { verifyFirebaseToken } from "@/lib/verifyFirebaseToken";
 
 export async function PUT(
   request: Request,
-  context: { params: { id: string } }
+  context: {
+    params: Promise<{
+      id: string;
+    }>;
+  }
 ) {
-  // Await dynamic parameters before destructuring
   const resolvedParams = await Promise.resolve(context.params);
   const { id } = resolvedParams;
 
@@ -63,7 +66,11 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  context: { params: { id: string } }
+  context: {
+    params: Promise<{
+      id: string;
+    }>;
+  }
 ) {
   // Await dynamic parameters before destructuring
   const resolvedParams = await Promise.resolve(context.params);
