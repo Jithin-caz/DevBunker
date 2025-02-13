@@ -67,11 +67,16 @@ export default function Home() {
     <div className="min-h-screen bg-background">
      
     <div className="  grid md:grid-cols-7 bg-red w-full min-h-dvh">
-      <div className="  col-span-7 md:col-span-2 bg-fixed
-      bg-[url('https://i.pinimg.com/736x/07/73/88/0773885809c4cb6071d7b6ea69654600.jpg')] 
-      md:bg-[url('https://i.pinimg.com/736x/03/99/65/0399659f0eb49c98327f4b37204819cb.jpg')] bg-contain 
-    bg-center  bg-yellow-200 min-h-20">
+      <div className=" relative w-full col-span-7 md:col-span-2">
+      <div className=" h-full bg-fixed border-b-4 border-r-0 md:border-r-4 shadow-xl md:border-b-0 border-offwhite
+      bg-[url('https://i.pinimg.com/736x/bd/04/4c/bd044c5a81cfcd36ef59e3a06aa4c6d0.jpg')] 
+      md:bg-[url('https://i.pinimg.com/736x/bd/04/4c/bd044c5a81cfcd36ef59e3a06aa4c6d0.jpg')]
+      //  bg-contain
+    bg-center  bg-black  min-h-20">
       </div>
+      <div className=" w-full h-full bg-black absolute top-0 opacity-40 backdrop-blur-2xl"></div>
+      </div>
+     
     <div className="col-span-7 md:col-span-5">
     <div className="max-w-4xl mx-auto mt-6 space-y-4 p-2">
         {posts.map((post, index) => (
