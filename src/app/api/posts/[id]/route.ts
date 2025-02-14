@@ -6,7 +6,11 @@ import { verifyFirebaseToken } from "@/lib/verifyFirebaseToken";
 // GET a single post
 export async function GET(
   request: Request,
-  context: { params: { id: string } }
+  context: {
+    params: Promise<{
+      id: string;
+    }>;
+  }
 ) {
   const resolvedParams = await Promise.resolve(context.params);
   const { id } = resolvedParams;
@@ -27,7 +31,11 @@ export async function GET(
 // UPDATE a post
 export async function PUT(
   request: Request,
-  context: { params: { id: string } }
+  context: {
+    params: Promise<{
+      id: string;
+    }>;
+  }
 ) {
   const resolvedParams = await Promise.resolve(context.params);
   const { id } = resolvedParams;
@@ -79,7 +87,11 @@ export async function PUT(
 // DELETE a post
 export async function DELETE(
   request: Request,
-  context: { params: { id: string } }
+  context: {
+    params: Promise<{
+      id: string;
+    }>;
+  }
 ) {
   const resolvedParams = await Promise.resolve(context.params);
   const { id } = resolvedParams;

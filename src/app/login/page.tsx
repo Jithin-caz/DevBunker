@@ -5,7 +5,8 @@ import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebaseConfig";
 
 export default function Login() {
-  const [userData, setUserData] = useState(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [userData, setUserData] = useState<any>(null);
   const [error, setError] = useState<string>("");
 
   const handleGoogleSignIn = async () => {

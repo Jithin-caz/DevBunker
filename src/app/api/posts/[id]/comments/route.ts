@@ -6,7 +6,11 @@ import { verifyFirebaseToken } from "@/lib/verifyFirebaseToken";
 // GET comments for a post
 export async function GET(
   request: Request,
-  context: { params: { id: string } }
+  context: {
+    params: Promise<{
+      id: string;
+    }>;
+  }
 ) {
   // Resolve dynamic route parameters
   const resolvedParams = await Promise.resolve(context.params);
@@ -29,7 +33,11 @@ export async function GET(
 // POST a new comment on a post
 export async function POST(
   request: Request,
-  context: { params: { id: string } }
+  context: {
+    params: Promise<{
+      id: string;
+    }>;
+  }
 ) {
   const resolvedParams = await Promise.resolve(context.params);
   const { id } = resolvedParams;
