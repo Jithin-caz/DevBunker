@@ -7,7 +7,6 @@ import { auth, googleProvider } from "@/lib/firebaseConfig";
 export default function Login() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [userData, setUserData] = useState<any>(null);
-  const [error, setError] = useState<string>("");
 
   const handleGoogleSignIn = async () => {
     try {
@@ -25,8 +24,8 @@ export default function Login() {
       }
       const data = await response.json();
       setUserData(data);
-    } catch (err:Error | unknown) {
-      setError(err.message);
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -39,7 +38,6 @@ export default function Login() {
       >
         Sign in with Google
       </button>
-      {error && <p style={{ color: "red" }}>Error: {error}</p>}
       {userData && (
         <div style={{ marginTop: "1rem" }}>
           <h2>Welcome, {userData.username}!</h2>

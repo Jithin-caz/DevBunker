@@ -2,7 +2,7 @@
 import { Mongoose } from "mongoose";
 
 declare global {
-  const mongoose: {
+  var mongoose: {
     conn: Mongoose | null;
     promise: Promise<Mongoose> | null;
   };
