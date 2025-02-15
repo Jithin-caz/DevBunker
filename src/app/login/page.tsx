@@ -25,9 +25,8 @@ export default function Login() {
       }
       const data = await response.json();
       setUserData(data);
-    } catch (err) {
-      console.log(err);
-      setError("Backend authentication");
+    } catch (err:Error | unknown) {
+      setError(err.message);
     }
   };
 
