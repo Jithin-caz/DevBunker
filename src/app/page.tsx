@@ -57,6 +57,38 @@ const posts: Posts[] = [
   },
 ];
 export default function Home() {
+  
+  const [reply, setReply] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+   const handleReplyFormSubmit = async (e: React.FormEvent) => {
+     e.preventDefault();
+     if (!reply.trim()) return;
+
+     setIsSubmitting(true);
+     try {
+      const postId=1
+       const response = await fetch('/api/replies', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({
+           postId,
+           content: reply
+         })
+       });
+
+       if (response.ok) {
+         setReply('');   //Clear the input
+        // onReplySubmit?.();   Call the callback if provided
+       }
+     } catch (error) {
+       console.error('Error posting reply:', error);
+     } finally {
+       setIsSubmitting(false);
+     }
+   };
   const [openSection, setOpenSection] = useState<number | null>(null);
 
   const toggleSection = (index: number) => {
@@ -123,6 +155,31 @@ export default function Home() {
                           </li>
                         ))}
                       </ul>
+      <form
+       onSubmit={handleReplyFormSubmit}
+        className="w-full mt-5">
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={reply}
+          onChange={(e) => setReply(e.target.value)}
+          placeholder="Write a reply..."
+          className="flex-1 px-4 py-2 bg-background text-primaryLight 
+                     border border-orange rounded-md 
+                     focus:outline-none focus:ring-2 focus:ring-orange/50"
+          disabled={isSubmitting}
+        />
+        <button
+          type="submit"
+          disabled={isSubmitting || !reply.trim()}
+          className="px-4 py-2 bg-orange text-white rounded-md
+                     hover:bg-orange/90 transition-colors duration-200
+                     disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? 'Sending...' : 'Reply'}
+        </button>
+      </div>
+    </form>
                     </div>
                   </div>
                 </div>

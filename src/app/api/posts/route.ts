@@ -17,11 +17,13 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  console.log("POST request received");
   await dbConnect();
   try {
     // Get and validate auth token from Firebase
     const authHeader = request.headers.get("authorization");
     if (!authHeader) {
+      console.log("No authorization header");
       return NextResponse.json(
         { message: "No authorization header" },
         { status: 401 }
@@ -58,6 +60,7 @@ export async function POST(request: Request) {
     await newPost.save();
     return NextResponse.json(newPost, { status: 201 });
   } catch (error) {
+    console.log("error is ",error);
     return NextResponse.json({ message: error }, { status: 401 });
   }
 }
