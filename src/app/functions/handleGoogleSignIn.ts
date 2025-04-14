@@ -18,7 +18,10 @@ export default async function handleGoogleSignIn() {
       throw new Error("Backend authentication failed");
     }
     const data = await response.json();
-    return data
+    return {
+      ...data,
+      token,
+    };
   } catch (err) {
     console.log(err);
   }

@@ -17,7 +17,6 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  console.log("POST request received");
   await dbConnect();
   try {
     // Get and validate auth token from Firebase
@@ -29,8 +28,10 @@ export async function POST(request: Request) {
         { status: 401 }
       );
     }
+    console.log("POST request received");
     const token = authHeader.split(" ")[1];
     if (!token) {
+      console.log("no token provided")
       return NextResponse.json(
         { message: "No token provided" },
         { status: 401 }

@@ -41,11 +41,12 @@ const Navbar = () => {
     console.log(`${title}--${content}---${category}`)
 
     try {
+      console.log(`token is ${userData.token}`)
       const response = await fetch('/api/posts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'authorization':''
+          'authorization':userData.token
         },
         body: JSON.stringify({
           title,
@@ -190,8 +191,8 @@ const PostForm=()=>{
                   if(!isLoggedIn)
                   {
                    const data=await handleGoogleSignIn()
-                  //  console.log('data is')
-                  //  console.log(data.username)
+                    console.log('data is')
+                    console.log(data)
                     
                    setUserData(data)
                    setIsLoggedIn(true)
