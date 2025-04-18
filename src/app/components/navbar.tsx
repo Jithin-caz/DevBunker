@@ -3,9 +3,11 @@ import { User, LogOut, UserCircle,LogIn } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import PopUpModal from "./postModal";
 import handleGoogleSignIn from "../functions/handleGoogleSignIn";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
 
+  const {token}=useAuth()
   const [userData, setUserData] = useState(null);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -41,12 +43,13 @@ const Navbar = () => {
     console.log(`${title}--${content}---${category}`)
 
     try {
+      //@ts-expect-error - userData type is not properly defined yet
       console.log(`token is ${userData.token}`)
       const response = await fetch('/api/posts', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'authorization':userData.token
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           title,

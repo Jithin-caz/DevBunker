@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Comment from "@/models/Comment";
 import { verifyFirebaseToken } from "@/lib/verifyFirebaseToken";
-
+import mongoose from "mongoose";
 // GET comments for a post
 export async function GET(
   request: Request,
@@ -17,7 +17,7 @@ export async function GET(
   const { id } = resolvedParams;
   await dbConnect();
   try {
-    const comments = await Comment.find({ post: id }).populate(
+    const comments = await Comment.find({ post: new mongoose.Types.ObjectId(id) }).populate(
       "author",
       "username"
     );
@@ -61,12 +61,14 @@ export async function POST(
     try {
       // Verify the Firebase token (this function should return the decoded token with uid)
       user = await verifyFirebaseToken(token);
+      console.log("user is "+user);
     } catch (err) {
       console.log(err);
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
 
-    const { content, parentComment } = await request.json();
+    const { content,userMongoId, parentComment } = await request.json();
+    console.log(`id is ${id}\ncontent is ${content}\nparentComment is ${parentComment}`);
     if (!content)
       return NextResponse.json(
         { message: "Content is required" },
@@ -74,15 +76,16 @@ export async function POST(
       );
 
     const newComment = new Comment({
-      post: id,
+      post:  new mongoose.Types.ObjectId(id),
       content,
       parentComment: parentComment || null,
       // Store the Firebase UID as the author
-      author: user.uid,
+      author:  new mongoose.Types.ObjectId(userMongoId),
     });
     await newComment.save();
     return NextResponse.json(newComment, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ message: error }, { status: 401 });
+    console.log("error is "+error);
+    return NextResponse.json({ message: error }, { status: 404 });
   }
 }

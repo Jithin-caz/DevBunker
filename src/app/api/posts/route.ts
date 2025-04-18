@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Post from "@/models/Post";
+import User from "@/models/User";
 import { verifyFirebaseToken } from "@/lib/verifyFirebaseToken";
 
 export async function GET() {
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
       console.log("No authorization header");
       return NextResponse.json(
         { message: "No authorization header" },
-        { status: 401 }
+        { status: 482 }
       );
     }
     console.log("POST request received");
@@ -34,15 +35,15 @@ export async function POST(request: Request) {
       console.log("no token provided")
       return NextResponse.json(
         { message: "No token provided" },
-        { status: 401 }
+        { status: 455 }
       );
     }
-    let user;
+    let firebaseUser;
     try {
-      user = await verifyFirebaseToken(token);
+      firebaseUser = await verifyFirebaseToken(token);
     } catch (err) {
       console.log(err);
-      return NextResponse.json({ message: "Invalid token" }, { status: 401 });
+      return NextResponse.json({ message: "Invalid token" }, { status: 491 });
     }
 
     const { title, content, category } = await request.json();
@@ -52,16 +53,22 @@ export async function POST(request: Request) {
         { status: 400 }
       );
 
+    // Retrieve the user from your MongoDB
+    const userDoc = await User.findOne({ firebaseId: firebaseUser.uid });
+    if (!userDoc) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
     const newPost = new Post({
       title,
       content,
       category,
-      author: user.uid,
+      author: userDoc._id, // Use the MongoDB ObjectId
     });
     await newPost.save();
     return NextResponse.json(newPost, { status: 201 });
   } catch (error) {
-    console.log("error is ",error);
-    return NextResponse.json({ message: error }, { status: 401 });
+    console.log(error);
+    return NextResponse.json({ message: error }, { status: 433 });
   }
 }

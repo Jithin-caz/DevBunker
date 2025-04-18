@@ -3,6 +3,29 @@ import dbConnect from "@/lib/dbConnect";
 import Comment from "@/models/Comment";
 import { verifyFirebaseToken } from "@/lib/verifyFirebaseToken";
 
+export async function GET(request: Request) {
+  try {
+    await dbConnect();
+
+    const { searchParams } = new URL(request.url);
+    const post = searchParams.get("post");
+
+    if (!post) {
+      return NextResponse.json(
+        { message: "Missing post in query params" },
+        { status: 400 }
+      );
+    }
+
+    const comments = await Comment.find({ post });
+
+    return NextResponse.json(comments, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
+  }
+}
+
 export async function PUT(
   request: Request,
   context: {
