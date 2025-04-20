@@ -7,7 +7,7 @@ import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
 
-  const {token}=useAuth()
+  const {token,user,logout}=useAuth()
   const [userData, setUserData] = useState(null);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -20,6 +20,14 @@ const Navbar = () => {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const loginFunction=  async () => {
+    const data=await handleGoogleSignIn()
+    console.log('data is')
+    console.log(data)
+    
+   setUserData(data)
+   setIsLoggedIn(true)
+  }
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -31,7 +39,19 @@ const Navbar = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
+useEffect(()=>{
+  if(token)
+  {
+    setIsLoggedIn(true)
+    //@ts-expect-error - userData type is not properly defined yet
+    setUserData(user)
+  }
+  else
+  {
+    setIsLoggedIn(false)
+    setUserData(null)
+  }
+},[token])
   const formSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -158,9 +178,16 @@ const PostForm=()=>{
         </div>
         <div className="flex justify-center gap-5 items-center">
           <button 
-          disabled={!isLoggedIn}
-            onClick={() => setIsOpen(true)}
-            className={` flex px-2 py-1 rounded  bg-orange hover:text-orange hover:bg-primaryDark text-primaryDark duration-300 ease-in-out ${isLoggedIn ?' cursor-default':' cursor-not-allowed'}`}
+            onClick={() => {
+              if(isLoggedIn)
+              {
+                setIsOpen(true)
+              }
+              else{
+                loginFunction()
+              }
+            }}
+            className={` flex px-2 py-1 rounded  bg-orange hover:text-orange hover:bg-primaryDark text-primaryDark duration-300 ease-in-out`}
           >
            {isLoggedIn?'create post':'Login to send post'}
           </button>
@@ -193,12 +220,11 @@ const PostForm=()=>{
                 onClick={async() => {
                   if(!isLoggedIn)
                   {
-                   const data=await handleGoogleSignIn()
-                    console.log('data is')
-                    console.log(data)
-                    
-                   setUserData(data)
-                   setIsLoggedIn(true)
+                    loginFunction()
+                  }
+                  else{
+                    logout()
+                    setIsLoggedIn(false)
                   }
                   setIsDropdownOpen(false);
                 }}

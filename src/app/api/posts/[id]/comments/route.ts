@@ -3,6 +3,7 @@ import dbConnect from "@/lib/dbConnect";
 import Comment from "@/models/Comment";
 import { verifyFirebaseToken } from "@/lib/verifyFirebaseToken";
 import mongoose from "mongoose";
+import User from "@/models/User";
 // GET comments for a post
 export async function GET(
   request: Request,
@@ -66,8 +67,12 @@ export async function POST(
       console.log(err);
       return NextResponse.json({ message: "Invalid token" }, { status: 401 });
     }
-
+    const userDoc = await User.findOne({ firebaseId:user.uid });
+    if (!userDoc) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
     const { content,userMongoId, parentComment } = await request.json();
+    console.log("userMongoId is "+userMongoId);
     console.log(`id is ${id}\ncontent is ${content}\nparentComment is ${parentComment}`);
     if (!content)
       return NextResponse.json(
@@ -80,7 +85,7 @@ export async function POST(
       content,
       parentComment: parentComment || null,
       // Store the Firebase UID as the author
-      author:  new mongoose.Types.ObjectId(userMongoId),
+      author:  userDoc._id,
     });
     await newComment.save();
     return NextResponse.json(newComment, { status: 201 });

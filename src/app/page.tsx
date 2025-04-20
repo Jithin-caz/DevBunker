@@ -25,6 +25,8 @@ interface Comment {
 
 export default function Home() {
   const { token, user } = useAuth();
+  console.log("token is " + token);
+  console.log("user is " + user);
   const [posts, setPosts] = useState<Post[]>([]);
   const [reply, setReply] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -169,7 +171,7 @@ export default function Home() {
                               <li className="text-sm text-offwhite">No replies yet</li>
                             )}
                           </ul>
-                          <form onSubmit={(e) => handleReplyFormSubmit(e, post.id)} className="w-full mt-5">
+                         {user?<form onSubmit={(e) => handleReplyFormSubmit(e, post.id)} className="w-full mt-5">
                             <div className="flex gap-2">
                               <input
                                 type="text"
@@ -187,7 +189,7 @@ export default function Home() {
                                 {isSubmitting ? 'Sending...' : 'Reply'}
                               </button>
                             </div>
-                          </form>
+                          </form>:<div className=" text-white">login to comment on this post</div>} 
                         </div>
                       </div>
                     </div>  
