@@ -25,6 +25,8 @@ interface Comment {
 }
 
 export default function Home() {
+  const[showSeeMore,setShowSeeMore]=useState(false)
+  const [currentPage, setCurrentPage] = useState(1);
   const { token, user } = useAuth();
   console.log("token is " + token);
   console.log("user is " + user);
@@ -53,12 +55,14 @@ export default function Home() {
     };
   }, []);
 
-  const fetchPosts = async () => {
+  const fetchPosts = async (page:number=1) => {
     setLoadingPosts(true);
     try {
-      const response = await fetch("/api/posts");
+      const response = await fetch(`/api/posts?page=${page}&limit=10`);
       if (response.ok) {
-        const data = await response.json();
+        const datafetched = await response.json();
+        const data=datafetched.posts
+        console.log("Fetched posts:", data);
         const transformedPosts = data.map((p: Post) => ({
           _id: p._id,
           title: p.title,
@@ -69,8 +73,24 @@ export default function Home() {
           createdAt: p.createdAt,
           updatedAt: p.updatedAt,
         }));
-        setPosts(transformedPosts);
+        if(posts.length===0)
+        {
+          setPosts(transformedPosts);
+          setShowSeeMore(true)
+        }
+       
+      else
+      setPosts((prevPosts) => {
+        const existingIds = new Set(prevPosts.map((post) => post._id));
+        const filteredPosts = transformedPosts.filter((post:Post) => !existingIds.has(post._id));
+        return [...prevPosts, ...filteredPosts];
+      });
+      if(data.length==0)
+      {
+        setShowSeeMore(false)}
       }
+     
+      setCurrentPage(currentPage+1)
     } catch (error) {
       console.error("Error fetching posts:", error);
     } finally {
@@ -91,7 +111,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetchPosts();
+    fetchPosts(currentPage);
   }, []);
 
   const toggleSection = (index: number) => {
@@ -228,6 +248,7 @@ export default function Home() {
                 </div>
               </div>
             ))}
+           {showSeeMore&& <button onClick={()=>fetchPosts(currentPage)} className="text-center w-full text-orange font-semibold text-lg">see more</button>}
           </div>
         </div>
       </div>

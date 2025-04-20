@@ -1,20 +1,33 @@
-import { NextResponse } from "next/server";
+import { NextResponse,NextRequest } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Post from "@/models/Post";
 import User from "@/models/User";
 import { verifyFirebaseToken } from "@/lib/verifyFirebaseToken";
 import { getIO } from "@/lib/socket";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   await dbConnect();
+
+  const { searchParams } = new URL(req.url);
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const limit = parseInt(searchParams.get("limit") || "10", 10);
+  const skip = (page - 1) * limit;
+
   try {
+    const totalPosts = await Post.countDocuments(); // For total pages if needed
     const posts = await Post.find({})
       .populate("author", "username")
-      .sort({ createdAt: -1 }); // Sort by newest posts first
-    return NextResponse.json(posts, { status: 200 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    return NextResponse.json(
+      { posts, totalPosts },
+      { status: 200 }
+    );
   } catch (error) {
     return NextResponse.json(
-      { message: "Error fetching posts", error: error },
+      { message: "Error fetching posts", error },
       { status: 500 }
     );
   }
