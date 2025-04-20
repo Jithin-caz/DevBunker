@@ -55,6 +55,20 @@ export default function Home() {
   //   };
   // }, []);
   useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      // Optionally, check for mobile by screen width (adjust threshold as needed)
+      if (window.innerWidth <= 768) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+        event.preventDefault();
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+  useEffect(() => {
     let hasScrolledToBottom = false;
     const thresholdBottom = 50; // pixels from bottom to consider as "scrolled to bottom"
     const thresholdTop = 50;    // pixels from top to consider as "at top"
