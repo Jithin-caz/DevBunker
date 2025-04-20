@@ -8,7 +8,9 @@ import { getIO } from "@/lib/socket";
 export async function GET() {
   await dbConnect();
   try {
-    const posts = await Post.find({}).populate("author", "username");
+    const posts = await Post.find({})
+      .populate("author", "username")
+      .sort({ createdAt: -1 }); // Sort by newest posts first
     return NextResponse.json(posts, { status: 200 });
   } catch (error) {
     return NextResponse.json(
