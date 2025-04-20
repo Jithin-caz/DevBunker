@@ -54,20 +54,7 @@ export default function Home() {
   //     socket.disconnect();
   //   };
   // }, []);
-  useEffect(() => {
-    const handlePopState = (event: PopStateEvent) => {
-      // Optionally, check for mobile by screen width (adjust threshold as needed)
-      if (window.innerWidth <= 768) {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
-        event.preventDefault();
-      }
-    };
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, []);
+  
   useEffect(() => {
     let hasScrolledToBottom = false;
     const thresholdBottom = 50; // pixels from bottom to consider as "scrolled to bottom"
@@ -212,15 +199,18 @@ export default function Home() {
               <div key={post._id} className="flex relative">
                 {/* Round Icon */}
                 <div className="absolute left-0 top-1/2 -translate-y-1/2">
-                  <div className="w-10 h-10 rounded-full bg-orange flex items-center justify-center flex-shrink-0">
+                  <div className={`w-10 h-10 rounded-full border ${index%2==0?"border-yellow-600":"border-orange"}  flex items-center justify-center flex-shrink-0`}>
                     <span className="text-background font-bold">
-                      {post.title.charAt(0).toUpperCase()}
+                        {post.category.toLowerCase().startsWith("web") && "🌐"}
+                        {post.category.toLowerCase().startsWith("ai") && "🤖"}
+                        {post.category.toLowerCase().startsWith("app") && "📱"}
+                        {post.category.toLowerCase().startsWith("error") && "❌"}
                     </span>
                   </div>
                 </div>
                 
                 {/* Collapsible Section */}
-                <div className="flex-1 bg-background border-b border-orange p-4 py-8 rounded shadow-lg ml-14">
+                <div className={`flex-1 bg-background border-b ${index%2==0?"border-yellow-600":"border-orange"}  p-4 py-8 rounded shadow-lg ml-14`}>
                   {/* Heading */}
                   <div className="flex justify-between gap-1 items-center cursor-pointer"
                        onClick={() => toggleSection(index)}>
@@ -287,6 +277,13 @@ export default function Home() {
           </div>
         </div>
       </div>
+      <button
+        onClick={() => window.location.reload()}
+        title="Fetch new posts"
+        className="fixed bottom-8 right-8 bg-orange text-black font-bold text-lg rounded-5 w-12 h-12 flex items-center justify-center shadow-lg"
+      >
+        F
+      </button>
     </div>
   );
 }
