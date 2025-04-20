@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import PopUpModal from "./postModal";
 import handleGoogleSignIn from "../functions/handleGoogleSignIn";
 import { useAuth } from "../context/AuthContext";
+import { toast} from "react-toastify";
+
 
 const Navbar = () => {
 
@@ -79,12 +81,12 @@ useEffect(()=>{
       });
 
       if (response.ok) {
-        alert('posted')
+        toast.success("Post created successfully!");
         // Reset form
         form.reset();
         setIsOpen(false);
       } else {
-        alert('not posted')
+        toast.error("Post not created");
         // Handle error
         console.error('Failed to create post');
       }

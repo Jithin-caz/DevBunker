@@ -3,6 +3,7 @@ import dbConnect from "@/lib/dbConnect";
 import Post from "@/models/Post";
 import User from "@/models/User";
 import { verifyFirebaseToken } from "@/lib/verifyFirebaseToken";
+import { getIO } from "@/lib/socket";
 
 export async function GET() {
   await dbConnect();
@@ -66,6 +67,12 @@ export async function POST(request: Request) {
       author: userDoc._id, // Use the MongoDB ObjectId
     });
     await newPost.save();
+    const io = getIO();
+  if (io) {
+    io.emit("new-post", newPost);
+  } else {
+    console.warn("Socket.IO not initialized yet.");
+  }
     return NextResponse.json(newPost, { status: 201 });
   } catch (error) {
     console.log(error);

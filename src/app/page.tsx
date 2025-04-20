@@ -2,10 +2,11 @@
 import { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useAuth } from "./context/AuthContext";
+import { io, Socket } from "socket.io-client";
+import Loading from "./loading"; // import your loading animation component
 
 interface Post {
-  _id?: string; 
-  id: string; 
+  _id: string; 
   title: string;
   content?: string;
   category: string;
@@ -33,15 +34,33 @@ export default function Home() {
   // Map of post id to its fetched comments.
   const [comments, setComments] = useState<{ [id: string]: Comment[] }>({});
   const [openSection, setOpenSection] = useState<number | null>(null);
+  // loading state for API calls (e.g. fetching posts/other data)
+  const [loadingPosts, setLoadingPosts] = useState<boolean>(false);
+
+  let socket: Socket;
+  useEffect(() => {
+    fetch("/api/socket");
+
+    socket = io(); // defaults to same origin
+
+    socket.on("new-post", (data) => {
+      console.log("New post received:", data);
+      setPosts((prevPosts) => [...prevPosts, data]);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   const fetchPosts = async () => {
+    setLoadingPosts(true);
     try {
       const response = await fetch("/api/posts");
       if (response.ok) {
         const data = await response.json();
-        // Map _id to id for each post
         const transformedPosts = data.map((p: Post) => ({
-          id: p._id,
+          _id: p._id,
           title: p.title,
           content: p.content,
           category: p.category,
@@ -54,6 +73,8 @@ export default function Home() {
       }
     } catch (error) {
       console.error("Error fetching posts:", error);
+    } finally {
+      setLoadingPosts(false);
     }
   };
 
@@ -74,9 +95,8 @@ export default function Home() {
   }, []);
 
   const toggleSection = (index: number) => {
-    // If opening the section, fetch comments for that post
     if (openSection !== index) {
-      const postId = posts[index].id;
+      const postId = posts[index]._id;
       fetchComments(postId);
       setOpenSection(index);
     } else {
@@ -104,8 +124,7 @@ export default function Home() {
       });
 
       if (response.ok) {
-        setReply('');   // Clear the input
-        // Refresh the comments list for this post
+        setReply('');
         fetchComments(postId);
       }
     } catch (error) {
@@ -115,12 +134,17 @@ export default function Home() {
     }
   };
 
+  // Display a loading animation while posts are being fetched
+  if (loadingPosts) {
+    return <Loading />;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <div className="grid md:grid-cols-7 bg-red w-full min-h-dvh">
         <div className="relative w-full col-span-7 md:col-span-2">
           <div className="h-full bg-fixed border-b-4 border-r-0 md:border-r-4 shadow-xl md:border-b-0 border-offwhite
-            bg-[url('https://i.pinimg.com/736x/bd/04/4c/bd044c5a81cfcd36ef59e3a06aa4c6d0.jpg')] 
+            bg-[url('https://i.pinimg.com/736x/bd/04/4c/bd044c5a81cfcd36ef59e3a06aa4c6d0.jpg')]
             md:bg-[url('https://i.pinimg.com/736x/bd/04/4c/bd044c5a81cfcd36ef59e3a06aa4c6d0.jpg')]
             bg-center bg-black min-h-20">
           </div>
@@ -130,8 +154,8 @@ export default function Home() {
         <div className="col-span-7 md:col-span-5">
           <div className="max-w-4xl mx-auto mt-6 space-y-7 p-2">
             {posts.map((post, index) => (
-              <div key={post.id} className="flex relative">
-                {/* Round Icon - Centered vertically */}
+              <div key={post._id} className="flex relative">
+                {/* Round Icon */}
                 <div className="absolute left-0 top-1/2 -translate-y-1/2">
                   <div className="w-10 h-10 rounded-full bg-orange flex items-center justify-center flex-shrink-0">
                     <span className="text-background font-bold">
@@ -145,7 +169,7 @@ export default function Home() {
                   {/* Heading */}
                   <div className="flex justify-between gap-1 items-center cursor-pointer"
                        onClick={() => toggleSection(index)}>
-                    <h2 className="text-lg text-primaryLight font-medium w-fit">{post.title}</h2>
+                    <h2 className="text-lg text-primaryLight font-medium w-fit"> {post.title}</h2>
                     {openSection === index ? (
                       <ChevronUp className="w-5 h-5 text-primaryLight transition-transform duration-300" />
                     ) : (
@@ -161,35 +185,42 @@ export default function Home() {
                         <div className="mt-3 border-t pt-4">
                           <h3 className="text-sm font-semibold text-gray-700">Replies:</h3>
                           <ul className="mt-1 space-y-1">
-                            {comments[post.id] && comments[post.id].length > 0 ? (
-                              comments[post.id].map((reply) => (
+                            {comments[post._id] && comments[post._id].length > 0 ? (
+                              comments[post._id].map((reply) => (
                                 <li key={reply._id} className="text-sm text-offwhite">
                                   • {reply.content}
                                 </li>
                               ))
                             ) : (
-                              <li className="text-sm text-offwhite">No replies yet</li>
+                              <li key={`${post._id}-no-replies`} className="text-sm text-offwhite">
+                                No replies yet
+                              </li>
                             )}
                           </ul>
-                         {user?<form onSubmit={(e) => handleReplyFormSubmit(e, post.id)} className="w-full mt-5">
-                            <div className="flex gap-2">
-                              <input
-                                type="text"
-                                value={reply}
-                                onChange={(e) => setReply(e.target.value)}
-                                placeholder="Write a reply..."
-                                className="flex-1 px-4 py-2 bg-background text-primaryLight border border-orange rounded-md focus:outline-none focus:ring-2 focus:ring-orange/50"
-                                disabled={isSubmitting}
-                              />
-                              <button
-                                type="submit"
-                                disabled={isSubmitting || !reply.trim()}
-                                className="px-4 py-2 bg-orange text-white rounded-md hover:bg-orange/90 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                                {isSubmitting ? 'Sending...' : 'Reply'}
-                              </button>
-                            </div>
-                          </form>:<div className=" text-white">login to comment on this post</div>} 
+
+                          {user ? (
+                            <form onSubmit={(e) => handleReplyFormSubmit(e, post._id)} className="w-full mt-5">
+                              <div className="flex gap-2">
+                                <input
+                                  type="text"
+                                  value={reply}
+                                  onChange={(e) => setReply(e.target.value)}
+                                  placeholder="Write a reply..."
+                                  className="flex-1 px-4 py-2 bg-background text-primaryLight border border-orange rounded-md focus:outline-none focus:ring-2 focus:ring-orange/50"
+                                  disabled={isSubmitting}
+                                />
+                                <button
+                                  type="submit"
+                                  disabled={isSubmitting || !reply.trim()}
+                                  className="px-4 py-2 bg-orange text-white rounded-md hover:bg-orange/90 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  {isSubmitting ? 'Sending...' : 'Reply'}
+                                </button>
+                              </div>
+                            </form>
+                          ) : (
+                            <div className="text-white">login to comment on this post</div>
+                          )}
                         </div>
                       </div>
                     </div>  
