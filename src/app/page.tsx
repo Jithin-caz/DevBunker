@@ -54,7 +54,28 @@ export default function Home() {
   //     socket.disconnect();
   //   };
   // }, []);
-
+  useEffect(() => {
+    let hasScrolledToBottom = false;
+    const thresholdBottom = 50; // pixels from bottom to consider as "scrolled to bottom"
+    const thresholdTop = 50;    // pixels from top to consider as "at top"
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const scrollHeight = document.documentElement.scrollHeight;
+      
+      // Check if user reached near the bottom
+      if (scrollTop + windowHeight >= scrollHeight - thresholdBottom) {
+        hasScrolledToBottom = true;
+      }
+      // Once the user has scrolled to bottom and then goes full to the top, refresh.
+      if (scrollTop <= thresholdTop && hasScrolledToBottom) {
+        window.location.reload();
+      }
+    };
+    
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
   const fetchPosts = async (page:number=1) => {
     setLoadingPosts(true);
     try {
