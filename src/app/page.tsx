@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useAuth } from "./context/AuthContext";
-import { io, Socket } from "socket.io-client";
+//import { io, Socket } from "socket.io-client";
 import Loading from "./loading"; // import your loading animation component
 
 interface Post {
@@ -39,21 +39,21 @@ export default function Home() {
   // loading state for API calls (e.g. fetching posts/other data)
   const [loadingPosts, setLoadingPosts] = useState<boolean>(false);
 
-  let socket: Socket;
-  useEffect(() => {
-    fetch("/api/socket");
+  // let socket: Socket;
+  // useEffect(() => {
+  //   fetch("/api/socket");
 
-    socket = io(); // defaults to same origin
+  //   socket = io(); // defaults to same origin
 
-    socket.on("new-post", (data) => {
-      console.log("New post received:", data);
-      setPosts((prevPosts) => [...prevPosts, data]);
-    });
+  //   socket.on("new-post", (data) => {
+  //     console.log("New post received:", data);
+  //     setPosts((prevPosts) => [...prevPosts, data]);
+  //   });
 
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+  //   return () => {
+  //     socket.disconnect();
+  //   };
+  // }, []);
 
   const fetchPosts = async (page:number=1) => {
     setLoadingPosts(true);
